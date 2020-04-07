@@ -1,3 +1,4 @@
+# import module for crawling
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from urllib.request import urlopen  # URL open import
@@ -7,29 +8,33 @@ import time
 import pandas as pd
 import numpy as np
 
+# import module for plotting
 from wordcloud import WordCloud
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
+# import module for arrangement
 from tkinter import *
 from tkinter import messagebox
 
+# main
 class main:
     def __init__(self, window):
-        self.t = []
-        self.n = {}
-        self.d = {}
-        self.naverbutton = []
-        self.daumbutton = []
-        self.mw = [[], []]
+        self.t = [] # time
+        self.n = {} 
+        self.d = {} 
+        self.naverbutton = [] # naver search word (rank)
+        self.daumbutton = [] # Daum search word (rank)
+        self.mw = [[], []] # max difference rank
         self.naverl = []
         self.dauml = []
         self.name = ["naver", "daum"]
 
         self.window = window
         self.Seasonal()
-
+    
+    # input crawling cycle
     def Seasonal(self):
         self.f = Frame(self.window, bg="snow");
         self.f.pack()
@@ -39,31 +44,33 @@ class main:
         self.es.pack(side="left", ipadx=10, ipady=10)
         self.bs = Button(self.f, text="입력", command=self.insertData, font=("Malgun Gothic", 11), bg="snow2");
         self.bs.pack(side="left", padx=10, pady=10)
-
+    
     def insertData(self):
         self.seasonal = int(self.es.get())
         self.f.pack_forget()
         self.showInfo()
-
+    
+    # arrangement of the main information
     def showInfo(self):
         self.window.geometry("825x970")
         self.window.resizable(False, False)
-        self.f1 = Frame(self.window, bg="snow");
+        self.f1 = Frame(self.window, bg="snow"); # wordcloud
         self.f1.grid(row=0, column=0, columnspan=2)
-        self.f5 = Frame(self.window, height=50, bg="snow");
+        self.f5 = Frame(self.window, height=50, bg="snow"); # frequency of enter, pie chart
         self.f5.grid(row=1, column=0, columnspan=2)
-        self.f2 = Frame(self.window, width=400, height=600, relief="solid", bg="snow");
+        self.f2 = Frame(self.window, width=400, height=600, relief="solid", bg="snow"); # naver search word
         self.f2.grid(row=2, column=0)
-        self.f3 = Frame(self.window, width=400, height=600, relief="solid", bg="snow");
+        self.f3 = Frame(self.window, width=400, height=600, relief="solid", bg="snow"); # daum search word
         self.f3.grid(row=2, column=1)
 
         self.f2_1 = Frame(self.f2, width=300, relief="solid", bd=2, bg="ghost white");
         self.f2_1.pack(pady=5)
         self.f3_1 = Frame(self.f3, width=300, relief="solid", bd=2, bg="ghost white");
         self.f3_1.pack(pady=5)
-        self.f4 = Frame(self.window, height=50, relief="solid", bd=2, bg="white");
+        
+        self.f4 = Frame(self.window, height=50, relief="solid", bd=2, bg="white"); # correlation, max rank difference
         self.f4.grid(row=3, column=0, columnspan=2)
-        self.f6 = Frame(self.window, height=50, bg="snow");
+        self.f6 = Frame(self.window, height=50, bg="snow"); # end
         self.f6.grid(row=4, column=0, columnspan=2, ipady=2)
 
         # wordcloud
@@ -71,7 +78,8 @@ class main:
         self.l1.grid(row=0, column=0, padx=3.5, pady=3)
         self.l2 = Label(self.f1, image=None);
         self.l2.grid(row=0, column=1, padx=3.5, pady=3)
-        # 진입 빈도
+        
+        # frequency of enter in rank 1~10
         self.l0_1 = Label(self.f1, text="[ 사이트별 진입한 검색어 횟수 TOP 5 ]", font=("Malgun Gothic", 12, "bold"), fg="deep Pink",
                           bg="snow");
         self.l0_1.grid(row=1, column=0, columnspan=2, padx=10, pady=3)
@@ -79,19 +87,22 @@ class main:
         self.l1_2.grid(row=2, column=0, padx=3.5, pady=3)
         self.l2_2 = Label(self.f1, image=None);
         self.l2_2.grid(row=2, column=1, padx=3.5, pady=3)
-        # 검색어 입력
+        
+        # search word
         self.l3 = Label(self.f2_1, text="Naver", font=("Arial", 14, "bold"), bg="lawn green");
         self.l3.grid(row=0, column=0, columnspan=2, ipadx=165)
         self.l4 = Label(self.f3_1, text="Daum ", font=("Arial", 14, "bold"), bg="royalBlue1");
         self.l4.grid(row=0, column=0, columnspan=2, ipadx=165)
-        # 검색어 순위 차이
+        
+        # search word rank difference
         self.l5 = Label(self.f4, text=None, font=("Malgun Gothic", 12, "bold"), fg="firebrick4", bg="white");
         self.l5.grid(row=0, column=0, padx=10, pady=3)
         self.l6 = Label(self.f4, text=None, font=("Malgun Gothic", 12, "bold"), fg="firebrick4", bg="white");
         self.l6.grid(row=0, column=1, padx=10, pady=3)
         self.l8 = Label(self.f5, text=None, font=("Malgun Gothic", 10), fg="blue", bg="snow");
         self.l8.pack(padx=5, pady=3)
-        # 종료 버튼
+       
+        # end button
         self.bt = Button(self.f6, text="종료", command=self.end, font=("Malgun Gothic", 11), fg="red", bg="white");
         self.bt.pack()
 
@@ -102,31 +113,31 @@ class main:
         if remaining is not None:
             self.remaining = remaining
         if self.remaining > 0:
-            self.l8.configure(text="update after %d sec" % self.remaining)  # 남은 시간을 표시
+            self.l8.configure(text="update after %d sec" % self.remaining)  # leftover time
             self.remaining = self.remaining - 1
-            self.window.after(1000, self.countdown)  # 1000ms(1초)가 지날 때마다 시간을 체크
-        if self.remaining == 0:  # 모든 시간이 경과한 경우
-            # 변수 초기화
+            self.window.after(1000, self.countdown)  # check time after 1000ms(1sec)
+        if self.remaining == 0:  # leftover time = 0
+            # variable initialize
             self.n = {}
             self.d = {}
             self.naverbutton = []
             self.daumbutton = []
             self.mw = [[], []]
-            self.remaining = self.seasonal * 60  # 다음번에 다시 사용하기 위해
+            self.remaining = self.seasonal * 60  # for future use
 
-            # 크롤링
+            # crawling
             self.crawl()
 
     def crawl(self):
-        # naver
-        now = time.localtime()  # 현재 시간
+        # Naver
+        now = time.localtime()  # current time
         h = now.tm_hour
         m = now.tm_min
 
         tim = """//*[@id="content"]/div/div[2]/div[1]/div[1]/div/div/div/div[2]/a[3]/span[1]"""
         tim = ndriver.find_element_by_xpath(tim).click()
 
-        # 현재시간
+        # current time
         hou = """//*[@id="u.c.layer.time"]/div[6]/a[1]"""
         hour = ndriver.find_element_by_xpath(hou).click()
 
@@ -139,25 +150,26 @@ class main:
         self.naver = []
         for i in range(10):
             for a in rank1[i]:
-                self.naver.append(a)  # naver 검색어 10개 저장
+                self.naver.append(a)  # 10 naver search word
         self.naverl.append(self.naver)
 
-        # daum
+        # Daum
         url = "https://www.daum.net/"
         page = urlopen(url)  ## web page read
         soup2 = BeautifulSoup(page, 'html.parser')
         rank2 = soup2.find_all("a", {"class": "link_issue"})
         self.daum = []
         for i in range(20):
-            self.daum.append(rank2[i].text)  # 다음 검색어 10개 저장
+            self.daum.append(rank2[i].text)  # 10 daum search word
         self.daum = self.daum[::2]
         self.dauml.append(self.daum)
 
-        self.t.append(str(now.tm_mon) + "/" + str(now.tm_mday) + " " + str(h) + ":" + str(m))  # 시간 저장
+        self.t.append(str(now.tm_mon) + "/" + str(now.tm_mday) + " " + str(h) + ":" + str(m))  # time
 
-        # 분석과 시각화에 필요한 데이터의 형태로 바꿔주기 위한 전처리 함수
+        # preprocess function (change data shape for analysis and visualization)
         self.preprocess()
-
+    
+    # preprocess
     def preprocess(self):
         self.naverday = pd.DataFrame({"word": self.naver, "rank": range(10)})
         self.naverday["rank"] += 1
@@ -166,7 +178,7 @@ class main:
         self.daumday["rank"] += 1
 
         self.totalword = pd.concat([self.naverday["word"], self.daumday["word"]]).unique()
-        # 차이 구하는 용
+        # for finding the difference of ranks for each word
         self.td = pd.DataFrame(0, index=range(len(self.totalword)), columns=["totalword", "naver", "daum"])
         self.td["totalword"] = self.totalword
 
@@ -177,12 +189,12 @@ class main:
                 if self.daumday.iloc[i, 0] == self.td.iloc[j, 0]:
                     self.td.iloc[j, 1] = self.naverday.iloc[i, 1]
 
-        # wordcloud용
+        # for wordcloud
         for i in range(10):
             self.n[self.naverday.loc[i, "word"]] = 11 - self.naverday.loc[i, "rank"]
             self.d[self.daumday.loc[i, "word"]] = 11 - self.daumday.loc[i, "rank"]
 
-        # 상관관계, 그래프용
+        # for correlation, plotting
         self.nd = pd.DataFrame(np.nan, index=self.totalword, columns=self.t)
         self.dd = pd.DataFrame(np.nan, index=self.totalword, columns=self.t)
         nl = [0] * len(self.nd.index)
@@ -204,7 +216,7 @@ class main:
                         dl[j] += 1
         self.dd["site"] = "Daum"
 
-        # 진입 횟수용
+        # for frequency of entry
         self.ni = pd.DataFrame({"word": self.nd.index, "진입": nl})
         self.di = pd.DataFrame({"word": self.dd.index, "진입": dl})
 
@@ -218,7 +230,7 @@ class main:
         colors = ["#BF0A30", "#002868"]
         cmap = LinearSegmentedColormap.from_list("mycmap", colors)
 
-        # 네이버
+        # Naver
         wordcloud = WordCloud(font_path="BMJUA_ttf.ttf", background_color="white", random_state=5, min_font_size=10,
                               max_font_size=80, colormap=cmap).generate_from_frequencies(self.n)
         fig = plt.figure(figsize=[4, 1.6])
@@ -230,7 +242,7 @@ class main:
         self.imga = PhotoImage(file=self.name[0] + ".png")
         self.l1.config(image=self.imga)
 
-        # 다음
+        # Daum
         wordcloud = WordCloud(font_path="BMJUA_ttf.ttf", background_color="white", random_state=5, min_font_size=10,
                               max_font_size=80, colormap=cmap).generate_from_frequencies(self.d)
         fig = plt.figure(figsize=[4, 1.6])
@@ -247,37 +259,39 @@ class main:
         plt.rc('font', family="Malgun Gothic")
         plt.rcParams.update({'figure.max_open_warning': 0})
 
-        # 순위 안으로 진입한 횟수가 많은 순으로 정렬 + 상위 5개 선택
+        # sort the frequency of entry in rank 1~10, pick top 5
         self.ni = self.ni.sort_values(by="진입", ascending=False)
         self.topni = self.ni[:5]
         self.di = self.di.sort_values(by="진입", ascending=False)
         self.topdi = self.di[:5]
 
+        fig3 = plt.figure(figsize=[4, 2])
+        colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'orange']
+        explode = (0.1, 0.1, 0.1, 0.1, 0.1)
+       
+        # Naver pie plot
         labels = []
         for i in range(5):
             labels.append(self.topni.iloc[i, 0] + "(" + str(self.topni.iloc[i, 1]) + ")")
 
-        fig3 = plt.figure(figsize=[4, 2])
-        colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'orange']
-        explode = (0.1, 0.1, 0.1, 0.1, 0.1)
-        # 네이버 pie plot
         plt.pie(self.topni["진입"], explode=explode, labels=labels, autopct='%1.1f%%', colors=colors, shadow=True,
                 startangle=140)
         plt.axis('equal')
         fig3.savefig("np.png")
         plt.clf()
 
+        # Daum pie plot
         labels = []
         for i in range(5):
             labels.append(self.topdi.iloc[i, 0] + "(" + str(self.topdi.iloc[i, 1]) + ")")
-
+            
         fig4 = plt.figure(figsize=[4, 2])
-        # 다음 pie plot
         plt.pie(self.topdi["진입"], explode=explode, labels=labels, autopct='%1.1f%%', colors=colors, shadow=True,
                 startangle=140)
         plt.axis('equal')
         fig4.savefig("dp.png")
-
+        
+        # show pie chart
         self.np = PhotoImage(file="np.png")
         self.dp = PhotoImage(file="dp.png")
         self.l1_2.config(image=self.np)
@@ -286,7 +300,7 @@ class main:
         self.l2_2.image = self.dp
 
     def printWord(self):
-        # 검색어 시각화
+        # visualize search word
         self.labels = []
         for i in range(10):
             c = lambda index=i: self.create_window(self.naver[index])
@@ -308,7 +322,7 @@ class main:
             self.daumbutton[i].grid(row=i + 1, column=1, padx=10, pady=2)
 
     def findDiff(self):
-        # 포털별 순위차이가 가장 큰/작은 검색어 분석
+        # find the most/less rank difference between search engine
         self.td["absdiff"] = abs(self.td["naver"] - self.td["daum"])
         maxdiff = self.td["absdiff"].max()
         mindiff = self.td["absdiff"].min()
@@ -322,7 +336,7 @@ class main:
             text="포털별 순위차이가 가장 큰 검색어: " + ", ".join(self.mw[0]) + "\n포털별 순위차이가 가장 작은 검색어: " + ", ".join(self.mw[1]))
 
     def relate(self):
-        # 네이버 연관검색어
+        # Naver related search term
         url="https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + quote(self.w)
         page = urlopen(url)
         soup2 = BeautifulSoup(page, 'html.parser')
@@ -331,7 +345,7 @@ class main:
         for i in range(len(rank2)):
             self.relateword.append(rank2[i].text)
 
-        # 다음 연관검색어
+        # Daum related search term
         url="https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&q=" + quote(self.w)
         page = urlopen(url)
         soup2 = BeautifulSoup(page, 'html.parser')
@@ -339,7 +353,7 @@ class main:
         for i in range(len(rank2)):
             self.relateword.append(rank2[i].text)
 
-        # 연관 뉴스
+        # related news
         url = "https://search.naver.com/search.naver?where=news&sm=tab_jum&query=" + quote(self.w)
         page = urlopen(url)
         soup2 = BeautifulSoup(page, 'html.parser')
@@ -348,10 +362,11 @@ class main:
         for i in range(4):
             self.relatenews.append(rank2[i].text)
 
-        # 연관 검색어와 뉴스의 포털별 중복 제거
+        # deduplication
         self.relateword = list(set(self.relateword))
         self.relatenews = list(set(self.relatenews))
-
+        
+        # visualize
         self.lt = Label(self.rel, text=" [ 연관 검색어 ] ", font=("Malgun Gothic", 15), bg="snow")
         self.lt.grid(row=0, column=0, columnspan=4)
 
@@ -390,7 +405,7 @@ class main:
         plt.rcParams['axes.unicode_minus'] = False
         plt.rcParams.update({'figure.max_open_warning': 0})
 
-        # 선택한 단어와 맞는 순위 만을 가져와 시간에 따른 순위 변화를 시각화
+        # bring the selected word and rank and plot the change in rank
         np = self.nd[self.nd.index == self.w]
         dp = self.dd[self.dd.index == self.w]
         p = pd.concat([np, dp])
@@ -410,10 +425,10 @@ class main:
         can = FigureCanvasTkAgg(fig2, self.canvas)
         can.get_tk_widget().pack()
 
-    # 상관관계
+    # correlation
     def corrcoef(self, a, b, num):
-        a=a.copy() # 순위값이 변하면 안되므로 copy
-        b=b.copy() # 순위값이 변하면 안되므로 copy
+        a=a.copy() # copy rank
+        b=b.copy() # copy rank
         for i in range(len(a)):
             if a.iloc[i]!=np.nan:
                 a.iloc[i]=12-a.iloc[i]
@@ -422,28 +437,29 @@ class main:
         a = a.fillna(1)
         b = b.fillna(1)
 
-        if num == 1:  # 포털사이트 별 전체 순위의 상관관계
+        if num == 1:  # Correlation of overall ranking by portal site
             ndfl = a.tolist()
             ddfl = b.tolist()
             self.coco = round(np.corrcoef(ndfl, ddfl)[0, 1], 3)
             self.l6.config(text="포털별 상관관계 정도 : " + str(round(self.coco, 3)))
 
-        if num == 2:  # 선택한 특정 검색어의 시간에 따른 순위 변화의 상관관계
+        if num == 2:  # Correlation of rank change over time for a specific search term
             ndfl = [0]+a.tolist()
             ddfl = [0]+b.tolist()
             self.coco = round(np.corrcoef(ndfl, ddfl)[0, 1], 3)
             self.co.config(text="시간별 상관관계 정도 : " + str(round(self.coco, 3)))
 
     def video(self):
-        self.ydriver = webdriver.Chrome('driver/chromedriver')  # 크롬 드라이버 지정 - 유투브
+        self.ydriver = webdriver.Chrome('driver/chromedriver')  # youtube
         self.ydriver.get("https://www.youtube.com/results?search_query="+self.w)
 
     def image(self):
-        self.gdriver = webdriver.Chrome('driver/chromedriver')  # 크롬 드라이버 지정 - 구글
+        self.gdriver = webdriver.Chrome('driver/chromedriver')  # google image
         self.gdriver.get("https://www.google.co.kr/imghp?hl=ko&tab=wi&ogbl")
         self.gdriver.find_element_by_name('q').send_keys(self.w)
         self.gdriver.find_element_by_xpath("""//*[@id="sbtc"]/button/div/span""").click()
 
+    # new window for selected search word
     def create_window(self, w):
         self.w = w
         self.window2 = Tk()
@@ -478,7 +494,8 @@ class main:
         self.window.destroy()
         ndriver.close()
 
-ndriver = webdriver.Chrome('driver/chromedriver')  # 크롬 드라이버 지정 - 네이버
+##################################################################################        
+ndriver = webdriver.Chrome('driver/chromedriver')  # CHROME DRIVER - OPEN 'NAVER'
 ndriver.get("https://datalab.naver.com/keyword/realtimeList.naver?where=main")
 
 window = Tk()
