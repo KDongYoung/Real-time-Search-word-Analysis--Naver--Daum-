@@ -1,7 +1,18 @@
 # Real-time-Search-word-Analysis--Naver--Daum-
-Real time Search word Analysis
+Real time Search word Analysis 
 
------------------------------------------------------------------------------------------------------------
+## Requirement
+1. Download packages
+
+for crawling : selenium, bs4, urllib
+
+for preprocessing : time, pandas, numpy
+
+for plotting : wordcloud, matpotlib
+
+for GUI : tkinter, threading
+
+
 ### Graphical User Interface
 
 1. input cycle
@@ -21,13 +32,3 @@ Real time Search word Analysis
 
 ![4](https://user-images.githubusercontent.com/37610908/78633968-cc5d6600-78dd-11ea-883b-636c37a83474.png)
 
-## Requirement
-1. Download packages
-
-for crawling : selenium, bs4, urllib
-
-for preprocessing : time, pandas, numpy
-
-for plotting : wordcloud, matpotlib
-
-for GUI : tkinter, threading
